@@ -1,0 +1,12 @@
+# Core testing runner
+pytest>=8.3
+
+# Richer assertion output
+pytest-clarity>=1.0.1
+
+# Coverage insights
+pytest-cov>=6.0
+
+# Property-based testing for edge cases
+hypothesis>=6.113
+
