@@ -3,6 +3,7 @@ and wind speed (min and max) in a table. The temperature values are stored in th
 control center, the other two values come hourly from the respective sensors'''
 
 from src.tdd_practice.weather_storage import store_temperature
+from src.tdd_practice.rainfall_storage import store_rainfall
 
 '''Test case 1 Store temperature data
 3 parameters for temperature: max, min, average
@@ -29,3 +30,18 @@ def test_store_temperature_data():
         'average': 7.5
     }
     
+
+'''Test case 2 Store rainfall value for an hour
+Store rainfall value for an hour
+'''
+
+def test_store_rainfall_value():
+    rainfall_value = 10
+    hour = 10
+    storage = {}
+    
+    store_rainfall(hour, rainfall_value, storage)
+    
+    # ASSERT: Verify the data was stored correctly
+    assert hour in storage
+    assert storage[hour]['rainfall'] == 10
