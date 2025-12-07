@@ -1,7 +1,3 @@
-'''algorithm for storing the hourly values of temperature (max, min, average), rainfall
-and wind speed (min and max) in a table. The temperature values are stored in the
-control center, the other two values come hourly from the respective sensors'''
-
 from src.tdd_practice.weather_storage import store_temperature
 from src.tdd_practice.rainfall_storage import store_rainfall
 
