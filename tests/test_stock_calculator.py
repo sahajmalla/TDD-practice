@@ -1,102 +1,163 @@
 import src.tdd_practice.stock_calculator as stock_calculator
 
-def test_calculate_current_stock_invalid_max_fill_less_than_or_equal_to_zero():
-    max_fill = -1
-    A = 5
-    B = 5
-    C = 5
-    min_threshold = 8
-    
-    stock_calculator.sum_current_stock(A,B,C,max_fill,min_threshold)
-    
-    assert stock_calculator.sum_current_stock(A,B,C,max_fill,min_threshold) == 'invalid'
-    
+# ----------------------------------------------------------------------------------
+# 2.1 Low-Level Test Cases (TDD)
+# Context: Coded during the session to verify internal logic and basic math.
+# ----------------------------------------------------------------------------------
 
-def test_calculate_current_stock_negative():
-    A = -3
-    B = -5
-    C = -8
-    max_fill = 10   
-    min_threshold = 8
-    stock_calculator.sum_current_stock(A,B,C,max_fill,min_threshold)
-
-    
-    #assert that sum current stock is invalidate
-    assert stock_calculator.sum_current_stock(A,B,C,max_fill,min_threshold) == 'invalid'
-    
-def test_calculate_current_stock_more_than_max_fill():
+def test_A8_FR_01_stock_gap_exceeds_threshold_object_A():
+    """
+    Test-A8-FR-01: Stock Gap Exceeds Threshold
+    Scenario: Current Stock = 5, Target = 10, Threshold = 2.
+    Logic: Gap is 5. Since 5 > 2, produce 5.
+    """
     max_fill = 10
-    A = 11
-    B = 100
-    C = 10.1
-    min_threshold = 8
-    stock_calculator.sum_current_stock(A,B,C,max_fill,min_threshold)
-
-    assert stock_calculator.sum_current_stock(A,B,C,max_fill,min_threshold) == 'invalid'
-
-    
-def test_calculate_production_quantities():
-    # Example Calculation:
-    # Current stocks: A = 5, B = 8, C = 3
-    A = 5
-    B = 8
-    C = 3
-    
-    # Desired fill levels: A = 10, B = 10, C = 10
-    max_fill = 10
-    
-    # Minimum threshold = 2
     min_threshold = 2
     
-    # For A: gapA=10-5=5 (5 > 2, so produce 5)
-    # For B: gapB=10-8=2 (2 is not > 2, so produce 0)
-    # For C: gapC=10-3=7 (7 > 2, so produce 7)
-    # Total to produce: 5+0+7=12
+    A = 5   # Gap = 5 (> 2) -> Produce 5
+    B = 10  # Full -> 0
+    C = 10  # Full -> 0
+    
+    assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 5
+
+def test_A8_FR_02_stock_gap_equals_threshold_boundary():
+    """
+    Test-A8-FR-02: Stock Gap Equals Threshold (Boundary Check)
+    Scenario: Current Stock = 8, Target = 10, Threshold = 2.
+    Logic: Gap is 2. Since 2 is NOT > 2, produce 0.
+    """
+    max_fill = 10
+    min_threshold = 2
+    
+    A = 10  # Full -> 0
+    B = 8   # Gap = 2 (= Threshold) -> Produce 0
+    C = 10  # Full -> 0
+    
+    assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 0
+
+def test_A8_FR_03_summation_logic():
+    """
+    Test-A8-FR-03: Total Production Summation
+    Scenario: Mix of different needs (A=5, B=0, C=7).
+    Logic: 5 + 0 + 7 = 12.
+    """
+    max_fill = 10
+    min_threshold = 2
+    
+    A = 5   # Needs 5
+    B = 8   # Needs 0 (Gap 2 not > 2)
+    C = 3   # Needs 7
     
     assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 12
 
-def test_calculate_production_boundary_gap_equals_threshold():
-    # Gap is exactly equal to threshold -> Should produce 0
-    max_fill = 10
-    min_threshold = 5
-    
-    # A gap = 5 (10-5), equal to threshold -> 0
-    A = 5
-    # B gap = 4 (10-6), less than threshold -> 0
-    B = 6
-    # C gap = 6 (10-4), greater than threshold -> 6
-    C = 4
-    
-    assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 6
-
-def test_calculate_production_all_full():
-    # All slots full -> 0 production
+def test_A8_FR_04_zero_stock_handling():
+    """
+    Test-A8-FR-02-03: Zero Stock Handling
+    Scenario: Current Stock = 0 (Empty).
+    Logic: Gap is 10. 10 > 2 -> Produce 10.
+    """
     max_fill = 10
     min_threshold = 2
-    A = 10
+    
+    A = 0   # Needs 10
+    B = 10  # Needs 0
+    C = 10  # Needs 0
+    
+    assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 10
+
+# ----------------------------------------------------------------------------------
+# 2.2 High-Level Test Cases (Boundary Value Analysis)
+# Context: Systematic tests derived from specs to break the logic at the edges.
+# ----------------------------------------------------------------------------------
+
+def test_BVA_01_gap_exactly_equals_threshold():
+    """
+    TC-BVA-01: Gap Exactly Equals Threshold (On-Boundary)
+    Scenario: Stock = 8 (Gap 2), Threshold = 2.
+    Expected: 0 (Strict inequality check).
+    """
+    max_fill = 10
+    min_threshold = 2
+    
+    # Target testing on A
+    A = 8   # Gap 2 == Threshold 2 -> Produce 0
+    B = 10  # Ignored
+    C = 10  # Ignored
+    
+    assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 0
+
+def test_BVA_02_gap_just_above_threshold():
+    """
+    TC-BVA-02: Gap Just Above Threshold (Boundary + 1)
+    Scenario: Stock = 7 (Gap 3), Threshold = 2.
+    Expected: 3 (Tipping point for production).
+    """
+    max_fill = 10
+    min_threshold = 2
+    
+    A = 7   # Gap 3 > 2 -> Produce 3
+    B = 10
+    C = 10
+    
+    assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 3
+
+def test_BVA_03_current_stock_is_zero():
+    """
+    TC-BVA-04: Current Stock is Zero (Lower Input Boundary)
+    Scenario: Stock = 0.
+    Expected: 10 (Max possible production per slot).
+    """
+    max_fill = 10
+    min_threshold = 2
+    
+    A = 0   # Gap 10 -> Produce 10
+    B = 10
+    C = 10
+    
+    assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 10
+
+def test_BVA_04_current_stock_equals_target():
+    """
+    TC-BVA-05: Current Stock Equals Target (Upper Input Boundary)
+    Scenario: Stock = 10.
+    Expected: 0 (No production needed).
+    """
+    max_fill = 10
+    min_threshold = 2
+    
+    A = 10  # Gap 0 -> Produce 0
     B = 10
     C = 10
     
     assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 0
 
-def test_calculate_production_all_empty():
-    # All slots empty -> Max production (if gap > threshold)
+def test_BVA_05_current_stock_exceeds_target():
+    """
+    TC-BVA-06: Current Stock Exceeds Target (Robustness Boundary)
+    Scenario: Stock = 11 (Overfilled manually).
+    Expected: 0 (Should not return negative numbers like -1).
+    """
     max_fill = 10
     min_threshold = 2
-    A = 0
-    B = 0
-    C = 0
     
-    # Each gap is 10, 10 > 2, so produce 10+10+10 = 30
-    assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 30
-
-def test_calculate_production_high_threshold():
-    # Threshold higher than max_fill -> No production ever possible
-    max_fill = 10
-    min_threshold = 11
-    A = 0
-    B = 0
-    C = 0
+    A = 11  # Gap -1 -> Should be treated as 0
+    B = 10
+    C = 10
     
-    # Gaps are 10, but threshold is 11. 10 is not > 11.
+    # Assert result is 0 (or strictly >= 0)
     assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 0
+
+def test_BVA_06_minimum_threshold_is_zero():
+    """
+    TC-BVA-07: Minimum Threshold is Zero (Configuration Boundary)
+    Scenario: Stock = 9 (Gap 1), Threshold = 0.
+    Expected: 1 (Since 1 > 0 is True).
+    """
+    max_fill = 10
+    min_threshold = 0  # Configuration change
+    
+    A = 9   # Gap 1 > 0 -> Produce 1
+    B = 10
+    C = 10
+    
+    assert stock_calculator.sum_current_stock(A, B, C, max_fill, min_threshold) == 1

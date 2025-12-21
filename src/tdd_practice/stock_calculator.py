@@ -3,8 +3,6 @@ def sum_current_stock(A, B, C, max_fill, min_threshold):
         return 'invalid'
     if (A < 0) or (B < 0) or (C < 0):
         return 'invalid'
-    if A > max_fill or B > max_fill or C > max_fill:
-        return 'invalid'
     
     production_a = 0
     production_b = 0
